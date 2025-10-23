@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class AnimationHandler : MonoBehaviour
 {
-    private static readonly int IsMoving = Animator.StringToHash("IsMove");
-    private static readonly int IsDamage = Animator.StringToHash("IsDamage");
+    private static readonly int IsMoving = Animator.StringToHash("isMove");
 
     protected Animator animator;
 
