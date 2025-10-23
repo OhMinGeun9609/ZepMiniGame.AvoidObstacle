@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : BaseController
 {
     private Camera camera;
+    private NpcController npc;
 
     protected override void Start()
     {
@@ -29,6 +30,37 @@ public class PlayerController : BaseController
         else
         {
             lookDirection = lookDirection.normalized;
+        }
+
+        if(npc != null && npc.canTalk)
+        {
+            if(Input.GetKeyDown(KeyCode.E))
+            {
+                npc.isTalk = true;
+            }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.CompareTag("Angela"))
+        {
+            npc = collision.GetComponent<NpcController>();
+            Debug.Log($"{npc.name}");
+            if (npc != null)
+                npc.canTalk = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Angela"))
+        {
+            npc = collision.GetComponent<NpcController>();
+            Debug.Log($"{npc.name}");
+            // 미니게임 설명 UI
+            if (npc != null)
+                npc.canTalk = false;
         }
     }
 }
