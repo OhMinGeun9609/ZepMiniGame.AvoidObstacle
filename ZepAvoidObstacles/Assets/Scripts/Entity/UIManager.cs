@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public TextMeshProUGUI canTalkText;
     [SerializeField] private GameObject panel;
-    public Button yesButton;
-    public Button noButton;
+    [SerializeField] private Button yesButton;
+    [SerializeField] private Button noButton;
 
     // Start is called before the first frame update
     void Start()
@@ -24,28 +24,34 @@ public class UIManager : MonoBehaviour
             Debug.LogError("Panel is Null");
         }
 
+        yesButton.onClick.AddListener(YesButtonOnClick);
+        noButton.onClick.AddListener(NoButtonOnClick);
+    }
+
+    void YesButtonOnClick()
+    {
+        EnterGameScene.Instance.EnterGame();
+    }
+    void NoButtonOnClick()
+    {
+        ClosePanel();
+    }
+
+    public void ShowText()
+    {
+        canTalkText.gameObject.SetActive(true);
+    }
+    public void HideText()
+    {
         canTalkText.gameObject.SetActive(false);
-        panel.SetActive(false);
-        
     }
 
-    public void ShowText(bool isActive)
+    public void ShowPanel()
     {
-        if (isActive)
-            canTalkText.gameObject.SetActive(true);
-        else
-            canTalkText.gameObject.SetActive(false);
+        panel.gameObject.SetActive(true);
     }
-
-    public void ShowPanel(bool isActive)
+    void ClosePanel()
     {
-        if(isActive)
-        {
-            panel.SetActive(true);
-        }
-        else
-        {
-            panel.SetActive(false);
-        }
-    }    
+        panel.gameObject.SetActive(false);
+    }
 }
