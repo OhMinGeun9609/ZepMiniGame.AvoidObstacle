@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Npc
   - Angela
+  - BackGround
+  - Ammo
+  - obstacle
+  - Bomb
   layers:
   - Default
   - TransparentFX

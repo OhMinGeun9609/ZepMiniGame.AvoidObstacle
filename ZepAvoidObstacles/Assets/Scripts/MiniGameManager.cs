@@ -5,8 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class MiniGameManager : MonoBehaviour
 {
-    private static readonly int DEFAULT_LEVEL = 1;
     private static readonly float UI_SHOW_TIME = 1f;
+    private static readonly int DEFAULT_LEVEL = 1;
+
 
     static MiniGameManager miniGameManager;
     public static MiniGameManager _instance { get { return miniGameManager; } }
@@ -14,32 +15,29 @@ public class MiniGameManager : MonoBehaviour
     private int currentScore = 0;
 
     MiniGameUIManager miniGameUiManager;
-    public MiniGameUIManager MiniUIManager { get { return miniGameUiManager; } }
 
     Player player;
     public Player PlayerInfo { get { return player; } }
 
     StageManager stageManager;
 
-    public StageManager Stage { get { return stageManager; } }
-
-    LightManager lightManager;
-    LightManager LightManager { get { return lightManager; } }
+    ScoreRecorder scoreRecord;
 
     public float playTimeDelta = 0;
 
+    private int stage = 1;
+    private bool check = false;
     private int gameLevel = 25;
-    public int stageLevel = 1;
+    private int best = 0;
+    
 
     private void Awake()
     {
         miniGameManager = this;
         miniGameUiManager = FindObjectOfType<MiniGameUIManager>();
-        lightManager = FindObjectOfType<LightManager>();
         player = FindObjectOfType<Player>();
-        stageManager = StageManager._instance;
-
-        DontDestroyOnLoad(lightManager);
+        stageManager = GetComponentInChildren<StageManager>();
+        scoreRecord = GetComponentInChildren<ScoreRecorder>();
     }
 
     private void Start()
@@ -50,18 +48,30 @@ public class MiniGameManager : MonoBehaviour
 
     private void Update()
     {
-        playTimeDelta += Time.deltaTime;    
+        if (stageManager == null) Debug.Log("stageManager is null");
+
+        playTimeDelta += Time.deltaTime;
+        stageManager.AddInterrupt(stage);
     }
 
     public void GameOver()
     {
-        Debug.Log("Game Over");
-        miniGameUiManager.SetRestart();
+        best = scoreRecord.JudgeAndSet(currentScore, stage);
+        miniGameUiManager.SetRestart(currentScore, best, stage);
     }
 
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void BackToMain()
+    {
+        SceneManager.LoadScene("ZepScene");
+    }
+    public void BackToTitle()
+    {
+        SceneManager.LoadScene("MiniTitle");
     }
 
     public void AddScore(int score)
@@ -74,18 +84,18 @@ public class MiniGameManager : MonoBehaviour
         {
             gameLevel++;
             player.PlayerLevelUp(gameLevel);
-            lightManager.TurnUp();
             miniGameUiManager.UpdateLevel(gameLevel);
-        }
 
-        if (gameLevel == 26)
-        {
-            stageLevel++;
+            check = stageManager.IsStageClear(gameLevel, playTimeDelta);
 
-            miniGameUiManager.ShowNextStage(UI_SHOW_TIME);
+            if(check)
+            {
+                miniGameUiManager.ShowNextStage(UI_SHOW_TIME);
+                player.ClearAndSpeedReset();
 
-            gameLevel = DEFAULT_LEVEL;
-            player.ClearAndSpeedReset();
+                gameLevel = DEFAULT_LEVEL;
+                stage++;
+            }
         }
     }
 }

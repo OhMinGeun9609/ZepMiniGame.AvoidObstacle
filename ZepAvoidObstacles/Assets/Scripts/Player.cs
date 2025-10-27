@@ -5,19 +5,22 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     private readonly float ACCEL = 1.1f;
-    private readonly float ADJUST = 0.003f;
+    private readonly float ADJUST = 0.002f;
     private readonly int DEFAULT_MAG = 1;
-    private readonly float DEFAULT_SPD = 3f;
+    private readonly float DEFAULT_SPD = 6f;
 
     Animator animator;
     Rigidbody2D _rigidbody;
+    GameObject ammo;
 
-    public float flapForce = 6f;
-    public float forworadSpeed = 3f;
+    public float horizontalDirection = 1f;
+    public float speed = 6f;
     public bool isDead = false;
     float deathCooldown = 0f;
 
     bool isFlap = false;
+    bool isDescent = false;
+    float vertical = 0;
 
     public bool godMode = false;
 
@@ -49,10 +52,7 @@ public class Player : MonoBehaviour
         {
             if (deathCooldown <= 0)
             {
-                if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
-                {
-                    gameManager.RestartGame();
-                }
+                gameManager.GameOver();
             }
             else
             {
@@ -61,10 +61,8 @@ public class Player : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
-            {
-                isFlap = true;
-            }
+            isFlap = true;
+            vertical = Input.GetAxisRaw("Vertical");
         }
     }
 
@@ -73,42 +71,49 @@ public class Player : MonoBehaviour
         if (isDead) return;
 
         Vector3 velocity = _rigidbody.velocity;
-        velocity.x = forworadSpeed;
+        velocity.x = horizontalDirection;
 
         if (isFlap)
         {
-            velocity.y += flapForce;
-            isFlap = false;
+            velocity.y = vertical;
         }
 
+        velocity = velocity.normalized * speed;
         _rigidbody.velocity = velocity;
 
-        float angle = Mathf.Clamp((_rigidbody.velocity.y * 10f), -90, 90);
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        //float angle = Mathf.Clamp((_rigidbody.velocity.y * 10f), -90, 90);
+        //transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (godMode) return;
-
         if (isDead) return;
 
         isDead = true;
         deathCooldown = 1f;
 
-        animator.SetInteger("isDie", 1);
+        if (collision.gameObject.CompareTag("Ammo") || collision.gameObject.CompareTag("Bomb"))
+        {
+            animator.SetBool("expl", true);
+        }
+
+        if (collision.gameObject.CompareTag("obstacle") || collision.gameObject.CompareTag("Untagged"))
+        {
+            animator.SetInteger("isDie", 1);
+        }
 
         gameManager.GameOver();
     }
 
     public void PlayerLevelUp(float level)
     {
-        if(level != 1)
-            forworadSpeed = forworadSpeed * (DEFAULT_MAG + ADJUST * Mathf.Pow(level, ACCEL));
+        if (level != 1)
+            speed = speed * (DEFAULT_MAG + ADJUST * Mathf.Pow(level, ACCEL));
     }
 
     public void ClearAndSpeedReset()
     {
-        forworadSpeed = DEFAULT_SPD;
+        speed = DEFAULT_SPD;
     }
 }

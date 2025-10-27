@@ -19,7 +19,6 @@ public class BgLooper : MonoBehaviour
     void Start()
     {
         gm = MiniGameManager._instance;
-        stageManager = StageManager._instance;
 
         obstaclesList = FindObjectsOfType<Obstacle>().ToList<Obstacle>();
         obstacleLastPosition = obstaclesList[0].transform.position;

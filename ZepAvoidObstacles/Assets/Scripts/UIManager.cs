@@ -4,22 +4,34 @@ using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 public class MiniGameUIManager : MonoBehaviour
 {
     private readonly string CURREN_LEVEL_DISPLAY = "Level : ";
-    private readonly int SHOW_COUNT = 3;
+    private readonly string POINT_UNIT = " Point";
+    private readonly string STAGE_UNIT = " Stage";
+
+    public MiniGameManager gm;
 
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI restartText;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI newStageText;
 
-    private int count = 0;
+    public TextMeshProUGUI bestScore;
+    public TextMeshProUGUI currentScore;
+    public TextMeshProUGUI reachedStageBest;
+    public GameObject panel;
+
+    public Button restartButton;
+    public Button ExitButton;
+    public Button TitleButton;
 
     // Start is called before the first frame update
     void Start()
     {
+        gm = MiniGameManager._instance;
         if (restartText == null)
             Debug.LogError("restart text is null");
         if (scoreText == null)
@@ -30,11 +42,33 @@ public class MiniGameUIManager : MonoBehaviour
             Debug.LogError("new stage text is null");
 
         restartText.gameObject.SetActive(false);
+        panel.gameObject.SetActive(false);
+
+        restartButton.onClick.AddListener(Retry);
+        ExitButton.onClick.AddListener(Exit);
+        TitleButton.onClick.AddListener(BackTitle);
     }
 
-    public void SetRestart()
+    public void Retry()
     {
-        restartText.gameObject.SetActive(true);
+        gm.RestartGame();
+    }
+
+    public void Exit()
+    {
+        gm.BackToMain();
+    }
+    public void BackTitle()
+    {
+        gm.BackToTitle();
+    }
+
+    public void SetRestart(int best, int current, int stage)
+    {
+        panel.gameObject.SetActive(true);
+        bestScore.text = best.ToString() + POINT_UNIT;
+        currentScore.text = current.ToString() + POINT_UNIT;
+        reachedStageBest.text = stage.ToString() + STAGE_UNIT;
     }
 
     public void UpdateScore(int score)
