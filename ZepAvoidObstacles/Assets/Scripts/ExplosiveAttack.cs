@@ -9,14 +9,14 @@ public class ExplosiveAttack : MonoBehaviour
     private SpriteRenderer sr;
     private Animator anim;
 
-    float duration = 3f;
+    float duration = 0.417f;
 
     Vector3 position;
 
     // Start is called before the first frame update
     void Start()
     {
-        anim = GetComponentInChildren<Animator>();
+        anim = GetComponent<Animator>();
         sr = GetComponent<SpriteRenderer>();
         cam = Camera.main;
         rigidbody = GetComponentInChildren<Rigidbody2D>();
@@ -33,32 +33,15 @@ public class ExplosiveAttack : MonoBehaviour
 
         transform.position = new Vector2(x, y);
 
-        Warning();
-
-        anim.SetBool("isBoom", true);
-
-        WaitAnime(duration);
+        DelayBomb(duration);
     }
 
-    private IEnumerator Warning()
+
+    private IEnumerator DelayBomb(float delay)
     {
-        float time = 0f;
-        Color start = sr.color;
-
-        while(time < duration)
-        {
-            time += Time.deltaTime;
-
-            start.a = Mathf.Lerp(start.a, 1f, duration);
-            sr.color = start;
-
-            yield return null;
-        }
-    }
-
-    private IEnumerable WaitAnime(float delay)
-    {
+        anim.SetBool("Boom", true);
         yield return new WaitForSeconds(delay);
+        Destroy(anim);
         Destroy(this.gameObject);
     }
 }

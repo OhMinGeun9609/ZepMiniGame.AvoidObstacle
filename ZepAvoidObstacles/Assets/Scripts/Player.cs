@@ -52,7 +52,9 @@ public class Player : MonoBehaviour
         {
             if (deathCooldown <= 0)
             {
+                DeletePlayer(1f);
                 gameManager.GameOver();
+                Time.timeScale = 0f;
             }
             else
             {
@@ -80,9 +82,6 @@ public class Player : MonoBehaviour
 
         velocity = velocity.normalized * speed;
         _rigidbody.velocity = velocity;
-
-        //float angle = Mathf.Clamp((_rigidbody.velocity.y * 10f), -90, 90);
-        //transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -93,7 +92,7 @@ public class Player : MonoBehaviour
         isDead = true;
         deathCooldown = 1f;
 
-        if (collision.gameObject.CompareTag("Ammo") || collision.gameObject.CompareTag("Bomb"))
+        if (collision.gameObject.CompareTag("Ammo"))
         {
             animator.SetBool("expl", true);
         }
@@ -102,8 +101,24 @@ public class Player : MonoBehaviour
         {
             animator.SetInteger("isDie", 1);
         }
+    }
 
-        gameManager.GameOver();
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (godMode) return;
+        if (isDead) return;
+
+        if (collision.gameObject.CompareTag("Bomb"))
+        {
+            animator.SetBool("expl", true);
+        }
+        else
+        {
+            return;
+        }
+
+        isDead = true;
+        deathCooldown = 1f;
     }
 
     public void PlayerLevelUp(float level)
@@ -115,5 +130,12 @@ public class Player : MonoBehaviour
     public void ClearAndSpeedReset()
     {
         speed = DEFAULT_SPD;
+    }
+
+    private IEnumerator DeletePlayer(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(this.gameObject);
+        Destroy(animator);
     }
 }

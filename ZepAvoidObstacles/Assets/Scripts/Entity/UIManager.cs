@@ -43,7 +43,7 @@ public class UIManager : MonoBehaviour
     }
     public void HideText()
     {
-        canTalkText.gameObject.SetActive(false);
+        if(canTalkText != null) canTalkText.gameObject.SetActive(false);
     }
 
     public void ShowPanel()

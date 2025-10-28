@@ -27,12 +27,13 @@ public class MiniGameManager : MonoBehaviour
 
     private int stage = 1;
     private bool check = false;
-    private int gameLevel = 25;
+    private int gameLevel = 1;
     private int best = 0;
     
 
     private void Awake()
     {
+        Time.timeScale = 1f;
         miniGameManager = this;
         miniGameUiManager = FindObjectOfType<MiniGameUIManager>();
         player = FindObjectOfType<Player>();
@@ -58,6 +59,7 @@ public class MiniGameManager : MonoBehaviour
     {
         best = scoreRecord.JudgeAndSet(currentScore, stage);
         miniGameUiManager.SetRestart(currentScore, best, stage);
+        Time.timeScale = 0f;
     }
 
     public void RestartGame()

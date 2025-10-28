@@ -57,7 +57,11 @@ public class PlayerController : BaseController
     {
         if (collision.gameObject.CompareTag("Npc"))
         {
-            gameManager.ExitToNPC();
+            if(gameManager != null)
+            {
+                gameManager.ExitToNPC();
+            }
+            
             isNpcArea = false;
         }
     }
